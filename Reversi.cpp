@@ -20,56 +20,57 @@ std::array<std::array<int, 8>, 8> Reversi::getBoard() {
 }
 
 bool Reversi::isValid(int row, int column, int color) {
+    if (board[row][column] != 0) {
+        return false;
+    }
+    board[row][column] = color;
     for (int i = 0; i < 8; i++) {
         if (i != row && i != row - 1 && i != row + 1 && board[i][column] == color) {
-            int flag = 0;
-            for (int j = std::min(i, row) + 1; j < std::max(i, row); j++) {
-                if (board[j][column] == -color) {
-                    continue;
-                } else {
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
+            if (canFlip(i, column, row, column)) {
+                board[row][column] = 0;
+                std::cerr << "valid in column" << std::endl;
                 return true;
             }
         }
     }
 
     for (int i = 0; i < 8; i++) {
-        if (i != column && i != column - 1 && i != column + 1 && board[column][i] == color) {
-            int flag = 0;
-            for (int j = std::min(i, column) + 1; j < std::max(i, column); j++) {
-                if (board[row][j] == -color) {
-                    continue;
-                } else {
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
+        if (i != column && i != column - 1 && i != column + 1 && board[row][i] == color) {
+            if (canFlip(row, i, row, column)) {
+                std::cerr << "valid in row" << std::endl;
+                board[row][column] = 0;
                 return true;
             }
         }
     }
 
-    for (int i = 0; i < row + column; i++) {
+    for (int i = 0; i <= row + column && i < 8; i++) {
+        if (row + column - i >= 8) {
+            continue;
+        }
         if (i != row && i != row - 1 && i != row + 1 && board[i][row + column - i] == color) {
-            int flag = 0;
-            for (int j = std::min(i, row) + 1; j < std::max(i, row); j++) {
-                if (board[i][row + column - i] == -color) {
-                    continue;
-                } else {
-                    flag = 1;
-                    break;
-                }
-            }
-            if (flag == 0) {
+            if (canFlip(row, column, i, row + column - i)) {
+                std::cerr << "valid in right diagnose" << std::endl;
+                board[row][column] = 0;
                 return true;
             }
         }
     }
+
+    for (int i = 0; i < 8; i++) {
+        if (column - row + i >= 8 || column - row + i < 0) {
+            continue;
+        }
+        if (i != row && i != row - 1 && i != row + 1 && board[i][column - row + i] == color) {
+            if (canFlip(row, column, i, column - row + i)) {
+                std::cerr << "valid in left diagnose" << std::endl;
+                std::cerr << "row:" << i << "column" << column - row + i << std::endl;
+                board[row][column] = 0;
+                return true;
+            }
+        }
+    }
+    board[row][column] = 0;
     return false;
 }
 
@@ -79,6 +80,7 @@ void Reversi::next(int row, int column, int color) {
         return;
     }
 
+    board[row][column] = color;
     for (int i = 0; i < 8; ++i) {
         if (canFlip(i, column, row, column)) {
             flip(i, column, row, column);
@@ -92,15 +94,25 @@ void Reversi::next(int row, int column, int color) {
     }
 
 
-    for (int i = 0; i < row + column; ++i) {
+    for (int i = 0; i <= row + column; ++i) {
         if (canFlip(row + column - i, i, row, column)) {
             flip(row + column - i, i, row, column);
+        }
+    }
+
+    for (int i = 0; i <= 8; ++i) {
+        if (canFlip(i, i - row + column, row, column)) {
+            flip(i, i - row + column, row, column);
         }
     }
 
 }
 
 bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
+    if (row1 >= 8 || row1 < 0 || row2 >= 8 || row2 < 0 || column1 >= 8 || column1 < 0 || column2 >= 8 || column2 <= 0) {
+        return false;
+    }
+
     if (row1 == row2) {
         int min = std::min(column1, column2);
         int max = std::max(column1, column2);
@@ -109,7 +121,7 @@ bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
         }
         int color = board[row1][max];
         for (int i = min + 1; i < max; i++) {
-            if (board[row1][i] == color) {
+            if (board[row1][i] != -color) {
                 return false;
             }
         }
@@ -117,6 +129,7 @@ bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
     }
 
     if (column1 == column2) {
+
         int min = std::min(row1, row2);
         int max = std::max(row1, row2);
         if (max - min <= 1 || board[max][column1] != board[min][column2]) {
@@ -124,7 +137,7 @@ bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
         }
         int color = board[max][column1];
         for (int i = min + 1; i < max; i++) {
-            if (board[i][column1] == color) {
+            if (board[i][column1] != -color) {
                 return false;
             }
         }
@@ -138,14 +151,31 @@ bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
         if (max - min <= 1 || board[min][sum - min] != board[max][sum - max]) {
             return false;
         }
-        int color = board[max][sum - min];
+        int color = board[max][sum - max];
         for (int i = min + 1; i < max; i++) {
-            if (board[i][sum - i] == color) {
+            if (board[i][sum - i] != -color) {
                 return false;
             }
         }
         return true;
     }
+
+    if (row1 - column1 == row2 - column2) {
+        int diff = row1 - column1;
+        int min = std::min(row1, row2);
+        int max = std::max(row1, row2);
+        if (max - min <= 1 || board[min][min - diff] != board[max][max - diff]) {
+            return false;
+        }
+        int color = board[max][max - diff];
+        for (int i = min + 1; i < max; i++) {
+            if (board[i][i - diff] != -color) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     return false;
 }
 
@@ -156,7 +186,7 @@ void Reversi::flip(int row1, int column1, int row2, int column2) {
 
         int color = board[row1][max];
         for (int i = min + 1; i < max; i++) {
-            board[row1][i] = -color;
+            board[row1][i] = color;
         }
         return;
     }
@@ -167,7 +197,7 @@ void Reversi::flip(int row1, int column1, int row2, int column2) {
 
         int color = board[max][column1];
         for (int i = min + 1; i < max; i++) {
-            board[i][column1] = -color;
+            board[i][column1] = color;
         }
         return;
     }
@@ -177,9 +207,22 @@ void Reversi::flip(int row1, int column1, int row2, int column2) {
         int min = std::min(row1, row2);
         int max = std::max(row1, row2);
 
-        int color = board[max][sum - min];
+        int color = board[max][sum - max];
         for (int i = min + 1; i < max; i++) {
-            board[i][sum - i] = -color;
+            board[i][sum - i] = color;
+        }
+        return;
+    }
+
+    if (row1 - column1 == row2 - column2) {
+        int diff = row1 - column1;
+        int min = std::min(row1, row2);
+        int max = std::max(row1, row2);
+
+        int color = board[max][max - diff];
+        std::cerr << "color:" << color << std::endl;
+        for (int i = min + 1; i < max; i++) {
+            board[i][i - diff] = color;
         }
         return;
     }
