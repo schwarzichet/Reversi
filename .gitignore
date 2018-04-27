@@ -1,0 +1,5 @@
+.#.*
+.idea/
+*.cbp
+.*~
+cmake-build-debug/
