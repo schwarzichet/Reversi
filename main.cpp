@@ -1,21 +1,19 @@
 #include <iostream>
 #include "Reversi.h"
+#include "MCTSNode.h"
 #include <cstdio>
 
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Hello!" << std::endl;
     Reversi r = Reversi();
-    while (true) {
+    r.printBoard();
+    while (!r.isTerminal()) {
         int row = 0, column = 0, color = 0;
         std::cin >> row >> column >> color;
-        r.next(row, column, color);
-        for(auto i : r.getBoard()){
-            for(auto j : i){
-                printf("%3d", j);
-            }
-            std::cout << std::endl;
-        }
-//        break;
+        r = r.next(row, column, color);
+        r.printBoard();
+
     }
     return 0;
 }
