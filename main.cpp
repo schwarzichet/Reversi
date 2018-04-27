@@ -1,8 +1,15 @@
 #include <iostream>
-#include "Reversi.h"
-#include "MCTSNode.h"
 #include <cstdio>
 
+#include "Reversi.h"
+#include "MCTSNode.h"
+#include "server.hpp"
+
+#define SERVER
+
+#undef SERVER
+
+#ifndef SERVER
 
 int main() {
     std::cout << "Hello!" << std::endl;
@@ -18,3 +25,15 @@ int main() {
     }
     return 0;
 }
+
+#endif // ifndef SERVER
+
+#ifdef SERVER
+
+int main(const int agrc, const char *argv[])
+{
+    server();
+    return 0;
+}
+
+#endif // ifndef SERVER
