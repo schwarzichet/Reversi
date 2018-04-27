@@ -103,7 +103,7 @@ MCTSNode *MCTSNode::completeGameRandomly() {
         auto board = node->boardState.next(possibleMove[mean].first, possibleMove[mean].second, color);
         node = new MCTSNode(node, board, -color);
     }
-    node->boardState.setWin();
+    node->win = node->boardState.setWin(color);
 
     return node;
 }
