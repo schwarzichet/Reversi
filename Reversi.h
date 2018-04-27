@@ -7,6 +7,8 @@
 
 
 #include <array>
+#include <vector>
+#include <memory>
 
 #define BLACK -1
 #define WHITE 1
@@ -18,7 +20,9 @@ private:
 public:
     Reversi();
 
-    void next(int row, int column, int color);
+    Reversi(const Reversi &reversi);
+
+    Reversi next(int row, int column, int color);
 
     std::array<std::array<int, 8>, 8> getBoard();
 
@@ -27,6 +31,15 @@ public:
     bool canFlip(int row1, int column1, int row2, int column2);
 
     void flip(int row1, int column1, int row2, int column2);
+
+    std::vector<std::pair<int, int>> possibleMovement(int color);
+
+    bool isTerminal();
+
+    bool setWin(int color);
+
+    void printBoard();
+
 
 };
 
