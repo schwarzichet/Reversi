@@ -13,36 +13,44 @@
 
 class MCTSNode {
 private:
-    int color;
     int wonTimes = 0;
     int visitTimes = 0;
     bool win = false;
     MCTSNode *father;
-    Reversi boardState;
 
 public:
-    std::vector<MCTSNode *> children;
+    int color;
+
+    Reversi boardState;
+
+    std::vector<std::shared_ptr<MCTSNode>> children;
 
     MCTSNode(MCTSNode *father, const Reversi &boardState, int color);
 
     bool isAllExpanded();
 
-    MCTSNode *bestChild();
+    std::shared_ptr<MCTSNode> bestChild();
 
-    MCTSNode *randomUnexpandedChild();
+    std::shared_ptr<MCTSNode> randomUnexpandedChild();
 
     void genChildren();
 
-    friend MCTSNode *expasion(MCTSNode *node);
+    friend std::shared_ptr<MCTSNode> selection(std::shared_ptr<MCTSNode> node);
 
-    friend MCTSNode *simulatoin(MCTSNode *node);
+    friend std::shared_ptr<MCTSNode> expansion(std::shared_ptr<MCTSNode> node);
+
+    friend std::shared_ptr<MCTSNode> simulation(std::shared_ptr<MCTSNode> node);
 
     friend void backpropagation(MCTSNode *node);
 
 
-    MCTSNode *completeGameRandomly();
+    std::shared_ptr<MCTSNode> completeGameRandomly();
 
     static const int C = static_cast<const int>(sqrt(2));
+
+    std::shared_ptr<MCTSNode> decideNext();
+
+    std::shared_ptr<MCTSNode> selectNext(int row, int column);
 };
 
 

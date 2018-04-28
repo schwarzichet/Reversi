@@ -36,7 +36,7 @@ public:
 
     bool isTerminal();
 
-    bool setWin(int color);
+    bool isWin(int color);
 
     void printBoard();
 

@@ -264,7 +264,7 @@ bool Reversi::isTerminal() {
 
 }
 
-bool Reversi::setWin(int color) {
+bool Reversi::isWin(int color) {
     if (isTerminal()) {
         int white = 0;
         int black = 0;
@@ -277,13 +277,7 @@ bool Reversi::setWin(int color) {
                 }
             }
         }
-        if ((white > black && color == WHITE || white < black && color == BLACK)) {
-            return true;
-        } else {
-            return false;
-        }
-
-
+        return white > black && color == WHITE || white < black && color == BLACK;
     }
 }
 
