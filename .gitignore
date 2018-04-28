@@ -3,3 +3,5 @@
 *.cbp
 .*~
 cmake-build-debug/
+
+node_modules/
