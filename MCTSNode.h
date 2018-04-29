@@ -34,6 +34,7 @@ public:
     std::shared_ptr<MCTSNode> randomUnexpandedChild();
 
     void genChildren();
+    void setNullFather();
 
     friend std::shared_ptr<MCTSNode> selection(std::shared_ptr<MCTSNode> node);
 
@@ -41,7 +42,7 @@ public:
 
     friend std::shared_ptr<MCTSNode> simulation(std::shared_ptr<MCTSNode> node);
 
-    friend void backpropagation(MCTSNode *node);
+    friend void backpropagation(MCTSNode *node, int color);
 
 
     std::shared_ptr<MCTSNode> completeGameRandomly();
@@ -51,6 +52,8 @@ public:
     std::shared_ptr<MCTSNode> decideNext();
 
     std::shared_ptr<MCTSNode> selectNext(int row, int column);
+
+    std::shared_ptr<MCTSNode> genChild(int row, int column);
 };
 
 

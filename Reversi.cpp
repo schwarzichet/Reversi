@@ -5,6 +5,7 @@
 #include "Reversi.h"
 #include <algorithm>
 #include <iostream>
+#include <assert.h>
 
 Reversi::Reversi() {
     board[0].fill(0);
@@ -28,7 +29,7 @@ bool Reversi::isValid(int row, int column, int color) {
         if (i != row && i != row - 1 && i != row + 1 && board[i][column] == color) {
             if (canFlip(i, column, row, column)) {
                 board[row][column] = 0;
-//                std::cerr << "valid in column" << std::endl;
+                //std::cerr << "valid in column" << std::endl;
                 return true;
             }
         }
@@ -37,7 +38,7 @@ bool Reversi::isValid(int row, int column, int color) {
     for (int i = 0; i < 8; i++) {
         if (i != column && i != column - 1 && i != column + 1 && board[row][i] == color) {
             if (canFlip(row, i, row, column)) {
-//                std::cerr << "valid in row" << std::endl;
+                //std::cerr << "valid in row" << std::endl;
                 board[row][column] = 0;
                 return true;
             }
@@ -50,7 +51,7 @@ bool Reversi::isValid(int row, int column, int color) {
         }
         if (i != row && i != row - 1 && i != row + 1 && board[i][row + column - i] == color) {
             if (canFlip(row, column, i, row + column - i)) {
-//                std::cerr << "valid in right diagnose" << std::endl;
+                //std::cerr << "valid in right diagnose" << std::endl;
                 board[row][column] = 0;
                 return true;
             }
@@ -63,7 +64,7 @@ bool Reversi::isValid(int row, int column, int color) {
         }
         if (i != row && i != row - 1 && i != row + 1 && board[i][column - row + i] == color) {
             if (canFlip(row, column, i, column - row + i)) {
-//                std::cerr << "valid in left diagnose" << std::endl;
+                //std::cerr << "valid in left diagnose" << std::endl;
 //                std::cerr << "row:" << i << "column" << column - row + i << std::endl;
                 board[row][column] = 0;
                 return true;
@@ -85,12 +86,15 @@ Reversi Reversi::next(int row, int column, int color) {
     r.board[row][column] = color;
     for (int i = 0; i < 8; ++i) {
         if (r.canFlip(i, column, row, column)) {
+            //std::cout << "can flip:" << i << " " << column << std::endl;
             r.flip(i, column, row, column);
         }
     }
 
     for (int i = 0; i < 8; ++i) {
         if (r.canFlip(row, i, row, column)) {
+            //std::cout << "can flip:" << row << " "<< i << std::endl;
+
             r.flip(row, i, row, column);
         }
     }
@@ -98,12 +102,15 @@ Reversi Reversi::next(int row, int column, int color) {
 
     for (int i = 0; i <= row + column; ++i) {
         if (r.canFlip(row + column - i, i, row, column)) {
+            //std::cout << "can flip:" << row + column - i << " "<< i << std::endl;
+
             r.flip(row + column - i, i, row, column);
         }
     }
 
     for (int i = 0; i <= 8; ++i) {
         if (r.canFlip(i, i - row + column, row, column)) {
+            //std::cout << "can flip:" << i << " "<< i - row + column << std::endl;
             r.flip(i, i - row + column, row, column);
         }
     }
@@ -111,7 +118,7 @@ Reversi Reversi::next(int row, int column, int color) {
 }
 
 bool Reversi::canFlip(int row1, int column1, int row2, int column2) {
-    if (row1 >= 8 || row1 < 0 || row2 >= 8 || row2 < 0 || column1 >= 8 || column1 < 0 || column2 >= 8 || column2 <= 0) {
+    if (row1 >= 8 || row1 < 0 || row2 >= 8 || row2 < 0 || column1 >= 8 || column1 < 0 || column2 >= 8 || column2 < 0) {
         return false;
     }
 
@@ -277,8 +284,9 @@ bool Reversi::isWin(int color) {
                 }
             }
         }
-        return white > black && color == WHITE || white < black && color == BLACK;
+        return (white > black && color == WHITE) || (white < black && color == BLACK);
     }
+    assert(false);
 }
 
 void Reversi::printBoard() {
@@ -300,5 +308,11 @@ void Reversi::printBoard() {
         std::cout << std::endl;
     }
 }
+
+void Reversi::setBoard(const std::array<std::array<int, 8>, 8> &board) {
+    Reversi::board = board;
+}
+
+
 
 
