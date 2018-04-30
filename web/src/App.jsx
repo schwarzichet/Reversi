@@ -19,14 +19,13 @@ const makeInitBoard = () => {
 }
 
 const humanStep = (i, j) => {
-    // TODO:
-    return null;
+    console.log(i, j);
 }
 
-const makeBlock = (key, color) => {
+const makeBlock = (i, j, color) => {
     return (
-	<div key={key} style={{height: "100px", width: "100px", backgroundColor: color}}>
-	    <div/>
+	<div key={i + "-" + j} style={{height: "100px", width: "100px", border: "1px rgb(200, 200, 200) solid", backgroundColor: "#fff170"}} onClick={() => humanStep(i, j)}>
+	    <div style={{height: "100px", width: "100px", borderRadius: "50px", backgroundColor: color}} />
 	</div>
     );
 }
@@ -46,8 +45,8 @@ class App extends Component {
 	    const row = [];
 	    for (let j = 0; j < 8; ++j) {
 		const data = board[i][j];
-		const color = (data === 1 ? "black" : (data === 0 ? "aqua" : "white"));
-		row.push(makeBlock(i + "-" + j, color));
+		const color = (data === 1 ? "black" : (data === 0 ? "#fff170" : "white"));
+		row.push(makeBlock(i, j, color));
 	    }
 	    retval.push(<div key={i}>{row}</div>);
 	}
