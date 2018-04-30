@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(Reversi)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-pthread -lboost_system ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -pthread -lboost_system ${CMAKE_CXX_FLAGS}")
 
 find_package(Boost REQUIRED)
 

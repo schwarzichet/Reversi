@@ -3,6 +3,7 @@
 //
 
 #include <cassert>
+#include <iostream>
 #include "MCTSNode.h"
 
 MCTSNode::MCTSNode(MCTSNode *father, const Reversi &boardState, int color) : father(father), boardState(boardState),
@@ -10,6 +11,10 @@ MCTSNode::MCTSNode(MCTSNode *father, const Reversi &boardState, int color) : fat
 
 bool MCTSNode::isAllExpanded() {
 //    return children.size()==boardState.possibleMovement(color).size();
+    if (children.size() == 0) {
+        return false;
+    }
+
     for (auto child : children) {
         if (child->visitTimes == 0) { return false; }
     }
@@ -33,6 +38,8 @@ std::shared_ptr<MCTSNode> MCTSNode::bestChild() {
 }
 
 std::shared_ptr<MCTSNode> MCTSNode::randomUnexpandedChild() {
+
+
     std::random_device r;
     size_t mean;
     do {
@@ -47,19 +54,21 @@ std::shared_ptr<MCTSNode> MCTSNode::randomUnexpandedChild() {
 void MCTSNode::genChildren() {
     for (auto step : this->boardState.possibleMovement(color)) {
         auto child = std::make_shared<MCTSNode>(this, this->boardState.next(step.first, step.second, color), -color);
-        children.push_back(child);
+//        children.push_back(child);
+        children.emplace_back(child);
     }
 }
 
 
 std::shared_ptr<MCTSNode> selection(std::shared_ptr<MCTSNode> node) {
-    while (node->children.size() == 0) {
+    while (node->children.size() != 0) {
         if (node->isAllExpanded()) {
             return selection(node->bestChild());
         } else {
             return selection(node->randomUnexpandedChild());
         }
     }
+    return node;
 }
 
 
@@ -80,49 +89,73 @@ std::shared_ptr<MCTSNode> simulation(std::shared_ptr<MCTSNode> node) {
 
 }
 
-void backpropagation(MCTSNode *node) {
+void backpropagation(MCTSNode *node, int color) {
+    //    node->win = node->boardState.isWin(color);
+    node->win = node->boardState.isWin(color);
     bool win = node->win;
-    while (node->father == nullptr) {
+    while (node->father != nullptr) {
         node->father->visitTimes++;
         if (win) {
             node->father->wonTimes++;
         }
+        node = node->father;
     }
+    std::cout << "back complete" << std::endl;
 }
 
 std::shared_ptr<MCTSNode> MCTSNode::completeGameRandomly() {
 //    return nullptr;
-    auto node = std::shared_ptr<MCTSNode>(this);
+    auto node = this;
+    std::shared_ptr<MCTSNode> retChild;
     while (!node->boardState.isTerminal()) {
         auto possibleMove = node->boardState.possibleMovement(node->color);
+
+        std::cout << "possibleMove size: " << possibleMove.size() << std::endl;
+
+        if (possibleMove.size() == 0) {
+            std::cout << "no possible movement, next player go" << std::endl;
+            auto child = std::make_shared<MCTSNode>(node, node->boardState, -node->color);
+            node->children.push_back(child);
+            node = child.get();
+            retChild = child;
+            continue;
+        }
+
         std::random_device r;
         std::default_random_engine e1(r());
         std::uniform_int_distribution<size_t> uniform_dist(0, possibleMove.size() - 1);
         size_t mean = uniform_dist(e1);
-        auto board = node->boardState.next(possibleMove[mean].first, possibleMove[mean].second, color);
-        node = std::make_shared<MCTSNode>(node.get(), board, -color);
-    }
-    node->win = node->boardState.isWin(color);
+        std::cout << "movement: " << possibleMove[mean].first << " " << possibleMove[mean].second << " " << node->color
+                  << std::endl;
+        auto board = node->boardState.next(possibleMove[mean].first, possibleMove[mean].second, node->color);
+        board.printBoard();
 
-    return node;
+        auto child = std::make_shared<MCTSNode>(node, board, -node->color);
+        node->children.push_back(child);
+        node = child.get();
+        retChild = child;
+    }
+    return retChild;
 }
 
 std::shared_ptr<MCTSNode> MCTSNode::decideNext() {
-    double max = 0;
+    double max = -1;
     std::shared_ptr<MCTSNode> bestChild = nullptr;
     for (auto child  : children) {
         if (child->visitTimes == 0) {
             continue;
         }
         double childUCB =
-                child->wonTimes / child->visitTimes + MCTSNode::C * sqrt(log(this->visitTimes / child->visitTimes));
+                child->wonTimes / child->visitTimes + MCTSNode::C * sqrt(log(this->visitTimes) / child->visitTimes);
         if (childUCB > max) {
             max = childUCB;
             bestChild = child;
         }
     }
-    bestChild->father = nullptr;
+    std::cout << "UCB: " << max << std::endl;
     assert(bestChild);
+
+    bestChild->father = nullptr;
     return bestChild;
 }
 
@@ -132,9 +165,23 @@ std::shared_ptr<MCTSNode> MCTSNode::selectNext(int row, int column) {
     }
     for (auto child : children) {
         if (child->boardState.getBoard()[row][column] == color) {
+            child->father = nullptr;
             return child;
         }
     }
-    assert(false);
-    return nullptr;
+    auto child = genChild(row, column);
+    child->father = nullptr;
+    return child;
+//            assert(false);
+//    return nullptr;
+}
+
+void MCTSNode::setNullFather() {
+    father = nullptr;
+}
+
+std::shared_ptr<MCTSNode> MCTSNode::genChild(int row, int column) {
+    auto child = std::make_shared<MCTSNode>(this, this->boardState.next(row, column, color), -color);
+    children.push_back(child);
+    return child;
 }

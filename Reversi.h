@@ -18,6 +18,8 @@ private:
     std::array<std::array<int, 8>, 8> board;
 
 public:
+    void setBoard(const std::array<std::array<int, 8>, 8> &board);
+
     Reversi();
 
     Reversi(const Reversi &reversi);
@@ -39,8 +41,6 @@ public:
     bool isWin(int color);
 
     void printBoard();
-
-
 };
 
 
