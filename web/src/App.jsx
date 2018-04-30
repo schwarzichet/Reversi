@@ -23,8 +23,12 @@ const humanStep = (i, j) => {
     return null;
 }
 
-const makeBlock = (color) => {
-    return <div style={{height: "100px", width: "100px", backgroundColor: color}} />;
+const makeBlock = (key, color) => {
+    return (
+	<div key={key} style={{height: "100px", width: "100px", backgroundColor: color}}>
+	    <div/>
+	</div>
+    );
 }
 
 class App extends Component {
@@ -43,9 +47,9 @@ class App extends Component {
 	    for (let j = 0; j < 8; ++j) {
 		const data = board[i][j];
 		const color = (data === 1 ? "black" : (data === 0 ? "aqua" : "white"));
-		row.push(makeBlock(color));
+		row.push(makeBlock(i + "-" + j, color));
 	    }
-	    retval.push(row);
+	    retval.push(<div key={i}>{row}</div>);
 	}
 	return retval;
     }
@@ -56,7 +60,7 @@ class App extends Component {
 		<header className="App-header">
 		    <h1 className="App-title">Reversi</h1>
 		</header>
-		<div style={{margin: "auto", width: "800px", height: "800px", backgroundColor: "#fff170", display: "flex", flexDirection: "column"}}>
+		<div style={{margin: "auto", width: "800px", height: "800px", backgroundColor: "#fff170", display: "flex", flexDirection: "row"}}>
 		    {
 			this.renderBoard()
 		    }
