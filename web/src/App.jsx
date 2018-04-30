@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
 import './App.css';
+
+const baseUrl = "http://127.0.0.1:8012";
 
 const makeInitBoard = () => {
     const retval = [];
@@ -18,13 +19,18 @@ const makeInitBoard = () => {
     return retval;
 }
 
-const humanStep = (i, j) => {
+const humanStep = (i, j, app) => {
     console.log(i, j);
+    const board = app.state.board;
+    board[i][j] = 1;
+    app.setState({
+	board: board
+    });
 }
 
-const makeBlock = (i, j, color) => {
+const makeBlock = (i, j, color, app) => {
     return (
-	<div key={i + "-" + j} style={{height: "100px", width: "100px", border: "1px rgb(200, 200, 200) solid", backgroundColor: "#fff170"}} onClick={() => humanStep(i, j)}>
+	<div key={i + "-" + j} style={{height: "100px", width: "100px", border: "1px rgb(200, 200, 200) solid", backgroundColor: "#fff170"}} onClick={() => humanStep(i, j, app)}>
 	    <div style={{height: "100px", width: "100px", borderRadius: "50px", backgroundColor: color}} />
 	</div>
     );
@@ -46,7 +52,7 @@ class App extends Component {
 	    for (let j = 0; j < 8; ++j) {
 		const data = board[i][j];
 		const color = (data === 1 ? "black" : (data === 0 ? "#fff170" : "white"));
-		row.push(makeBlock(i, j, color));
+		row.push(makeBlock(i, j, color, this));
 	    }
 	    retval.push(<div key={i}>{row}</div>);
 	}
