@@ -18,12 +18,36 @@ const makeInitBoard = () => {
     return retval;
 }
 
+const humanStep = (i, j) => {
+    // TODO:
+    return null;
+}
+
+const makeBlock = (color) => {
+    return <div style={{height: "100px", width: "100px", backgroundColor: color}} />;
+}
+
 class App extends Component {
     constructor(props) {
 	super(props);
 	this.state = {
 	    board: makeInitBoard()
 	}
+    }
+
+    renderBoard() {
+	const board = this.state.board;
+	const retval = [];
+	for (let i = 0; i < 8; ++i) {
+	    const row = [];
+	    for (let j = 0; j < 8; ++j) {
+		const data = board[i][j];
+		const color = (data === 1 ? "black" : (data === 0 ? "aqua" : "white"));
+		row.push(makeBlock(color));
+	    }
+	    retval.push(row);
+	}
+	return retval;
     }
     
     render() {
@@ -32,15 +56,9 @@ class App extends Component {
 		<header className="App-header">
 		    <h1 className="App-title">Reversi</h1>
 		</header>
-		<div style={{margin: "auto", width: "800px", height: "800px", backgroundColor: "aqua"}}>
+		<div style={{margin: "auto", width: "800px", height: "800px", backgroundColor: "#fff170", display: "flex", flexDirection: "column"}}>
 		    {
-			//const board = this.state.board;
-			//for (let i = 0; i < 8; ++i) {
-			//    for (let j = 0; j < 8; ++j) {
-			//	const data = board[i][j];
-			//    }
-			//}
-			<div/>
+			this.renderBoard()
 		    }
 		</div>
 	    </div>
