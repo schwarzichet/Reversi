@@ -19,10 +19,8 @@ private:
     MCTSNode *father;
 
 public:
-    int color;
-
     Reversi boardState;
-
+    int color;
     std::vector<std::shared_ptr<MCTSNode>> children;
 
     MCTSNode(MCTSNode *father, const Reversi &boardState, int color);
@@ -34,7 +32,6 @@ public:
     std::shared_ptr<MCTSNode> randomUnexpandedChild();
 
     void genChildren();
-    void setNullFather();
 
     friend std::shared_ptr<MCTSNode> selection(std::shared_ptr<MCTSNode> node);
 
