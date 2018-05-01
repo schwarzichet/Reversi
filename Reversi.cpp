@@ -302,8 +302,13 @@ void Reversi::printBoard() {
         printf("%2d|", index);
         index++;
         for (auto j : i) {
-
-            printf("%3d", j);
+            if(j==1){
+                printf("  ○");
+            }else if(j==-1){
+                printf("  ●");
+            }else{
+                printf("  □");
+            }
         }
         std::cout << std::endl;
     }
