@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const baseUrl = "http://127.0.0.1:8012";
+const baseUrl = "http://localhost:8012";
 
 const makeInitBoard = () => {
     const retval = [];
@@ -22,9 +22,30 @@ const makeInitBoard = () => {
 const humanStep = (i, j, app) => {
     console.log(i, j);
     const board = app.state.board;
-    board[i][j] = 1;
-    app.setState({
-	board: board
+    const url = baseUrl + '/nextboard/' + i + '/' + j + '/black';
+    fetch(url, {
+	method: 'GET',
+	headers: new Headers({
+	    'Accept': 'application/json'
+	})
+    }).then((res) => {
+	return res.text();
+    }).then((res) => {
+	const nextResult = JSON.parse(res);
+	if (!nextResult.valid) {
+	    throw 'invalid move';
+	}
+	const nextboard = nextResult.board;
+	app.setState({
+	    board: nextboard
+	});
+	return fetch(baseUrl + '/ainext', {
+	    method: 'GET',
+	    headers: new Headers({
+		'Accept': 'application/json'
+	    })
+	});
+    }).then((res) => {
     });
 }
 
