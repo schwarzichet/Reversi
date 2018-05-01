@@ -13,7 +13,13 @@ auto should_exit = false;
 
 void do_session(boost::asio::ip::tcp::socket &sock)
 {
+    namespace http = boost::beast::http;
 
+    boost::system::error_code ec;
+    boost::beast::flat_buffer buffer;
+
+    http::request<http::string_body> req;
+    http::read(socket, buffer, req, ec);
 }
 
 void server()
