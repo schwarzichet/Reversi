@@ -23,17 +23,26 @@ const makeInitBoard = () => {
 
 const aiFirst = () => {
     makeInitBoard();
+    fetch(baseUrl + '/start/ai/human');
+    mode = 'human-ai';
 }
 
 const humanFirst = () => {
     makeInitBoard();
     fetch(baseUrl + '/start/human/ai');
+    mode = 'human-ai';
 }
 
 const humanToHuman = () => {
+    makeInitBoard();
+    fetch(baseUrl + '/start/human/human');
+    mode = 'human-human';
 }
 
 const aiToAi = () => {
+    makeInitBoard();
+    fetch(baseUrl + '/start/ai/ai');
+    mode = 'ai-ai';
 }
 
 const humanStep = (i, j, app) => {
@@ -51,12 +60,16 @@ const humanStep = (i, j, app) => {
     }).then((res) => {
 	const nextResult = JSON.parse(res);
 	if (!nextResult.valid) {
+	    alert('invalid move!');
 	    throw {reason: 'invalid move'};
 	}
 	const nextboard = nextResult.board;
 	app.setState({
 	    board: nextboard
 	});
+	if (mode !== 'human-ai') {
+	    return;
+	}
 	return fetch(baseUrl + '/ainext', {
 	    method: 'GET',
 	    headers: new Headers({
