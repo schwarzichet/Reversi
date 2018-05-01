@@ -19,7 +19,7 @@ void do_session(boost::asio::ip::tcp::socket &sock)
     boost::beast::flat_buffer buffer;
 
     http::request<http::string_body> req;
-    http::read(socket, buffer, req, ec);
+    http::read(sock, buffer, req, ec);
 }
 
 void server()
