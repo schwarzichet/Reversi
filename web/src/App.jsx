@@ -3,6 +3,8 @@ import './App.css';
 
 const baseUrl = "http://localhost:8012";
 
+let mode = 'human-ai';
+
 const makeInitBoard = () => {
     const retval = [];
     for (let i = 0; i < 8; ++i) {
@@ -19,7 +21,23 @@ const makeInitBoard = () => {
     return retval;
 }
 
+const aiFirst = () => {
+    makeInitBoard();
+}
+
+const humanFirst = () => {
+    makeInitBoard();
+    fetch(baseUrl + '/start/human/ai');
+}
+
+const humanToHuman = () => {
+}
+
+const aiToAi = () => {
+}
+
 const humanStep = (i, j, app) => {
+    // Now only for Human first.
     console.log(i, j);
     const board = app.state.board;
     const url = baseUrl + '/nextboard/' + i + '/' + j + '/black';
@@ -33,7 +51,7 @@ const humanStep = (i, j, app) => {
     }).then((res) => {
 	const nextResult = JSON.parse(res);
 	if (!nextResult.valid) {
-	    throw 'invalid move';
+	    throw {reason: 'invalid move'};
 	}
 	const nextboard = nextResult.board;
 	app.setState({
@@ -46,6 +64,11 @@ const humanStep = (i, j, app) => {
 	    })
 	});
     }).then((res) => {
+	return res.text();
+    }).then((res) => {
+	const result = JSON.parse(res);
+	const {board, column, row, color} = result;
+	app.setState({board: board});
     });
 }
 
@@ -85,6 +108,20 @@ class App extends Component {
 	    <div className="App">
 		<header className="App-header">
 		    <h1 className="App-title">Reversi</h1>
+		    <div style={{height: '100px', margin: 'auto', display: 'flex', flexDirection: 'row'}}>
+			<div style={{backgroundColor: 'gray', height: '100px', width: '100px', marginRight: '10px'}}>
+			    <span style={{margin: 'auto', fontSize: '20px'}}>AI First</span>
+			</div>
+			<div style={{backgroundColor: 'gray', height: '100px', width: '100px', marginRight: '10px'}} onClick={humanFirst}>
+			    <span style={{margin: 'auto', fontSize: '20px'}}>Human First</span>
+			</div>
+			<div style={{backgroundColor: 'gray', height: '100px', width: '100px', marginRight: '10px'}}>
+			    <span style={{margin: 'auto', fontSize: '20px'}}>Human to human</span>
+			</div>
+			<div style={{backgroundColor: 'gray', height: '100px', width: '100px', marginRight: '10px'}}>
+			    <span style={{margin: 'auto', fontSize: '20px'}}>AI to AI</span>
+			</div>
+		    </div>
 		</header>
 		<div style={{margin: "auto", width: "800px", height: "800px", backgroundColor: "#fff170", display: "flex", flexDirection: "row"}}>
 		    {
